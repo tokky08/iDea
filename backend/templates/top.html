@@ -1,8 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
 
-    <form action="/" method="POST">
-        <input name="word"></input>
+    <h1 class="text-center mt-5">あなたのiDeaを引き出します</h1>
+    <p class="img_iDea"><img src="{{url_for('static', filename='image/iDea.png')}}"></p>
+    <form action="/" method="POST" class="text-center">
+        <input name="word" class="text-center"></input>
+        <p><button class="btn btn-primary btn-lg mt-4" type="submit" name="word" value={{word}}>送信</button><p>
     </form>
-    
+
 {% endblock %}
