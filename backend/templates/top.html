@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="top">
+    <h1 class="text-center mt-5">あなたのiDeaを<br>引き出します</h1>
+    <!--<p class="img_iDea"><img src="{{url_for('static', filename='image/iDea.png')}}"></p>-->
+    <p class="img_iDea"><img src="{{url_for('static', filename='image/nattokucat.png')}}"></p>
+    <form action="/" method="POST" class="text-center mt-5">
+        <input name="word" class="text-center border border-info w-100 p-3 rounded" placeholder="キーワードを入力してください"></input>
+        <p><button class="btn btn-primary btn-lg mt-5" type="submit" name="word" value={{word}}>はじめる</button><p>
+    </form>
+<div>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="again mt-5">
+    <div class="card bg-light mb-3 mx-auto mt-5">
+        <div class="card-header">{{logs[-2]}}と言えば</div>
+        <div class="card-body">
+            <h1 class="card-title text-center mt-5 mb-5">{{word}}</h1>
+        </div>
+    </div>
+    <div class="d-flex justify-content-between mx-auto my-5">
+        <form action="/log" method="POST" class="mb-5">
+            <button class="btn btn-primary" type="submit" name="logs" value={{logs}}>終了する</button>
+        </form>
+        <form action="" method="POST">
+            <button class="btn btn-primary" type="submit" name="word" value={{word}}>くわしく</button>
+        </form>
+        <form action="/again" method="POST">
+            <button class="btn btn-primary" type="submit" name="word" value={{word}}>もう一回</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
