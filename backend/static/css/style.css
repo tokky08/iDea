@@ -1,11 +1,16 @@
+@import url("https://fonts.googleapis.com/css?family=Abel");
+#body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; }
+  #body #footer {
+    margin-top: auto; }
+
 .img_iDea {
   margin: 0 auto;
   width: 50%; }
   .img_iDea img {
     width: 100%; }
-
-#footer {
-  margin-bottom: 0 !important; }
 
 .top {
   width: 90%;

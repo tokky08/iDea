@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
 </head>
-<body>
+<body id="body">
     <header class="navbar navbar-light bg-light">
         <a class="navbar-brand w-25 text-center" href="#">
             <img src="{{url_for('static', filename='image/nattokucat.png')}}" width="30" height="30" class="d-inline-block align-top" alt="">
@@ -24,7 +24,7 @@
         {% block content %}
         {% endblock %}
     </main>
-    <footer id="footer" class="p-3 mb-2 bg-light text-dark text-center">
+    <footer id="footer" class="p-3 bg-light text-dark text-center">
         <small>© 2020 iDea by tokky08</small>
     </footer>
 </body>
