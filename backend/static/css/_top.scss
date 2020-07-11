@@ -1,0 +1,42 @@
+.top{
+    width: 90%;
+    margin: 0 auto;
+}
+
+.img_iDea{
+    margin: 0 auto;
+    width: 50%;
+    img{
+        width: 100%;
+    }
+}
+
+form{
+    .top_input{
+        width: 100%;
+    }
+}
+
+
+@media(min-width: 768px){
+    .catch_copy{
+        br{
+            display: none;
+        }
+    }
+}
+
+@media(min-width: 768px){
+    .img_iDea{
+        margin: 0 auto;
+        width: 20%;
+    }   
+}
+
+@media(min-width: 768px){
+    form{
+        .top_input{
+            width: 25%;
+        }
+    }
+}

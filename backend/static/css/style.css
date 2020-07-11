@@ -6,16 +6,29 @@
   #body #footer {
     margin-top: auto; }
 
+.top {
+  width: 90%;
+  margin: 0 auto; }
+
 .img_iDea {
   margin: 0 auto;
   width: 50%; }
   .img_iDea img {
     width: 100%; }
 
-.top {
-  width: 90%;
-  margin: 0 auto; }
+form .top_input {
+  width: 100%; }
 
+@media (min-width: 768px) {
+  .catch_copy br {
+    display: none; } }
+@media (min-width: 768px) {
+  .img_iDea {
+    margin: 0 auto;
+    width: 20%; } }
+@media (min-width: 768px) {
+  form .top_input {
+    width: 25%; } }
 .again {
   width: 90%;
   margin: 0 auto; }

@@ -10,6 +10,10 @@ app = Flask(__name__)
 
 logs = []
 
+@app.route("/test/<name>", methods=["GET", "POST"])
+def test(name):
+    return name
+
 @app.route("/", methods=["GET", "POST"])
 def top():
     if request.method == "GET":
@@ -24,8 +28,8 @@ def top():
         
 @app.route("/again", methods=["GET", "POST"])
 def again():
-    # word = scrayping(request.form["word"])
-    word = "グーグル"
+    word = scrayping(request.form["word"])
+    # word = "グーグル"
     logs.append(word)
     return render_template('again.html', word=word, logs=logs)
 
@@ -64,4 +68,4 @@ def scrayping(word):
 
 ## おまじない
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

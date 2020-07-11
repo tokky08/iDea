@@ -1,11 +1,24 @@
 {% extends "layout.html" %}
 {% block content %}
 
-    <h1>{{logs[0]}}</h1>
-    <ul>
-    {% for log in logs[1:] %}
-        <li>{{log}}</li>
-    {% endfor %}
-    </ul>
-    
+    <table class="table mt-5">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col" class="text-center">key</th>
+                <th scope="col" class="text-center">{{logs[0]}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs[1:] %}
+            <tr>
+                <th scope="row" class="text-center">{{loop.index}}</th>
+                <td class="text-center">{{log}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form action="/" method="GET" class="text-center mt-3">
+        <p><button class="btn btn-primary btn-lg mt-5" type="submit" name="word" value={{word}}>はじめからもう一回する</button><p>
+    </form>
+
 {% endblock %}
