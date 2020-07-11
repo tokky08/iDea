@@ -1,11 +1,4 @@
 @import url("https://fonts.googleapis.com/css?family=Abel");
-#body {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh; }
-  #body #footer {
-    margin-top: auto; }
-
 .top {
   width: 90%;
   margin: 0 auto; }
@@ -31,6 +24,22 @@ form .top_input {
     width: 25%; } }
 .again {
   width: 90%;
-  margin: 0 auto; }
+  margin: 0 auto;
+  margin-top: 3rem; }
+
+@media (min-width: 768px) {
+  .again {
+    width: 50%;
+    margin-top: 9rem; } }
+@media (min-width: 1024px) {
+  .again {
+    width: 30%;
+    margin-top: 9rem; } }
+#body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; }
+  #body #footer {
+    margin-top: auto; }
 
 /*# sourceMappingURL=style.css.map */
