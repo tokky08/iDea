@@ -10,6 +10,10 @@ app = Flask(__name__)
 
 logs = []
 
+@app.route("/test/<name>", methods=["GET", "POST"])
+def test(name):
+    return name
+
 @app.route("/", methods=["GET", "POST"])
 def top():
     if request.method == "GET":
@@ -64,4 +68,4 @@ def scrayping(word):
 
 ## おまじない
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

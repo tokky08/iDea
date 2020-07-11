@@ -1,0 +1,19 @@
+.again{
+    width: 90%;
+    margin: 0 auto;
+    margin-top: 3rem;
+}
+
+@media(min-width: 768px){
+    .again{
+        width: 50%;
+        margin-top: 9rem;
+    }
+}
+
+@media(min-width: 1024px){
+    .again{
+        width: 30%;
+        margin-top: 9rem;
+    }
+}

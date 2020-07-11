@@ -1,0 +1,15 @@
+.log{
+    width: 98%;
+}
+
+@media(min-width: 768px){
+    .log{
+        width: 50%;
+    }
+}
+
+@media(min-width: 1024px){
+    .log{
+        width: 40%;
+    }
+}
