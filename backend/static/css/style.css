@@ -17,9 +17,20 @@ form .top_input {
     display: none; } }
 @media (min-width: 768px) {
   .img_iDea {
-    margin: 0 auto;
-    width: 20%; } }
+    width: 40%; } }
 @media (min-width: 768px) {
+  form .top_input {
+    width: 40%; } }
+@media (min-width: 1024px) {
+  .img_iDea {
+    width: 25%; } }
+@media (min-width: 1024px) {
+  form .top_input {
+    width: 30%; } }
+@media (min-width: 1440px) {
+  .img_iDea {
+    width: 20%; } }
+@media (min-width: 1440px) {
   form .top_input {
     width: 25%; } }
 .again {
