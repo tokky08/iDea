@@ -5,7 +5,8 @@
 
 .img_iDea {
   margin: 0 auto;
-  width: 50%; }
+  width: 50%;
+  width: 100%; }
   .img_iDea img {
     width: 100%; }
 
@@ -46,6 +47,15 @@ form .top_input {
   .again {
     width: 30%;
     margin-top: 9rem; } }
+.log {
+  width: 98%; }
+
+@media (min-width: 768px) {
+  .log {
+    width: 50%; } }
+@media (min-width: 1024px) {
+  .log {
+    width: 40%; } }
 #body {
   display: flex;
   flex-direction: column;

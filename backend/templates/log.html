@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
 
-    <table class="table mt-5">
+<div class="log mx-auto">
+    <h1 class="text-center text-muted mt-4">履歴（Log）</h1>
+    <table class="table mt-4">
         <thead class="thead-light">
             <tr>
                 <th scope="col" class="text-center">key</th>
@@ -20,5 +22,6 @@
     <form action="/" method="GET" class="text-center mt-3">
         <p><button class="btn btn-primary btn-lg mt-5" type="submit" name="word" value={{word}}>はじめからもう一回する</button><p>
     </form>
+</div>
 
 {% endblock %}
