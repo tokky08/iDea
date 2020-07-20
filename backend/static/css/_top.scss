@@ -6,7 +6,6 @@
 .img_iDea{
     margin: 0 auto;
     width: 50%;
-    width: 100%;
     img{
         width: 100%;
     }
@@ -16,6 +15,10 @@ form{
     .top_input{
         width: 100%;
     }
+}
+
+.q_title{
+    font-size: 0.8rem;
 }
 
 @media(min-width: 768px){
