@@ -12,6 +12,9 @@
 form .top_input {
   width: 100%; }
 
+.q_title {
+  font-size: 0.8rem; }
+
 @media (min-width: 768px) {
   .catch_copy br {
     display: none; } }
