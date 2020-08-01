@@ -24,6 +24,7 @@ def top():
         word = scrayping(request.form["word"])
         logs.append(request.form["word"])
         logs.append(word)
+        print(request.form["word"])
         return render_template('again.html', word=word, logs=logs)
         
 @app.route("/again", methods=["GET", "POST"])
