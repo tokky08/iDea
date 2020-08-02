@@ -29,8 +29,8 @@ def top():
         
 @app.route("/again", methods=["GET", "POST"])
 def again():
-    # word = scrayping(request.form["word"])
-    word = "グーグル"
+    word = scrayping(request.form["word"])
+    # word = "グーグル"
     logs.append(word)
     return render_template('again.html', word=word, logs=logs)
 
