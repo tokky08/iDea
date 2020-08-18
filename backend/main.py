@@ -3,39 +3,82 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import random
+from flask import Flask, session, redirect, url_for,  request
 
 
 app = Flask(__name__)
 
-logs = []
-
-@app.route("/test/<name>", methods=["GET", "POST"])
-def test(name):
-    return name
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
+logs_user = {}
 
 @app.route("/", methods=["GET", "POST"])
 def top():
     if request.method == "GET":
-        global logs
-        logs = []
         return render_template('top.html')
     else:
         word = scrayping(request.form["word"])
-        logs.append(request.form["word"])
-        logs.append(word)
-        return render_template('again.html', word=word, logs=logs)
+        log = []
+        log.append(request.form["word"])
+        log.append(word)
+        session['id'] = random.random()
+        session_id = session["id"]
+        logs_user[session_id] = log
+
+        # words_log = []
+        # for id in logs_user:
+        #     if str(id) == str(session_id):
+        #         words_log = logs_user[id]
+
+        # logs_user_func(session_id, word)
+        words_log = words_log_func(session_id)
+
+
+        return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
         
 @app.route("/again", methods=["GET", "POST"])
 def again():
+    session_id = request.form["session_id"]
     word = scrayping(request.form["word"])
-    # word = "グーグル"
-    logs.append(word)
-    return render_template('again.html', word=word, logs=logs)
+
+    # words_log = []
+    # for id in logs_user:
+    #     if str(id) == str(session_id):
+    #         logs_user[id].append(word)
+    #         words_log = logs_user[id]
+
+    logs_user_func(session_id, word)
+    words_log = words_log_func(session_id)
+
+    # logs.append(word)
+    return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
 
 @app.route("/log", methods=["GET", "POST"])
 def log():
-    return render_template('log.html', logs=logs)
-        
+    session_id = request.form["session_id"]
+
+    # words_log = []
+    # for id in logs_user:
+    #     if str(id) == str(session_id):
+    #         words_log = logs_user[id]
+    
+    words_log = words_log_func(session_id)
+
+    return render_template('log.html', words_log=words_log)
+
+
+def words_log_func(session_id):
+    words_log = []
+    for id in logs_user:
+        if str(id) == str(session_id):
+            words_log = logs_user[id]
+    return words_log
+
+
+def logs_user_func(session_id, word):
+    for id in logs_user:
+        if str(id) == str(session_id):
+            logs_user[id].append(word)
+    
 
 def scrayping(word):
     driver = webdriver.Chrome("driver/chromedriver")
