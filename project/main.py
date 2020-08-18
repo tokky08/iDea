@@ -3,40 +3,59 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import random
-
-
+import secret
 
 app = Flask(__name__)
 
-logs = []
-
-@app.route("/test/<name>", methods=["GET", "POST"])
-def test(name):
-    return name
+app.secret_key = secret.secret_key
+users_log = {}
 
 @app.route("/", methods=["GET", "POST"])
 def top():
     if request.method == "GET":
-        global logs
-        logs = []
         return render_template('top.html')
     else:
         word = scrayping(request.form["word"])
-        logs.append(request.form["word"])
-        logs.append(word)
-        return render_template('again.html', word=word, logs=logs)
+        log = []
+        log.append(request.form["word"])
+        log.append(word)
+        session['id'] = random.random()
+        session_id = session["id"]
+        users_log[session_id] = log
+        words_log = words_log_func(session_id)
+
+        return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
         
 @app.route("/again", methods=["GET", "POST"])
 def again():
+    session_id = request.form["session_id"]
     word = scrayping(request.form["word"])
-    # word = "グーグル"
-    logs.append(word)
-    return render_template('again.html', word=word, logs=logs)
+    users_log_func(session_id, word)
+    words_log = words_log_func(session_id)
+
+    return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
 
 @app.route("/log", methods=["GET", "POST"])
 def log():
-    return render_template('log.html', logs=logs)
-        
+    session_id = request.form["session_id"]
+    words_log = words_log_func(session_id)
+
+    return render_template('log.html', words_log=words_log)
+
+
+def words_log_func(session_id):
+    words_log = []
+    for id in users_log:
+        if str(id) == str(session_id):
+            words_log = users_log[id]
+    return words_log
+
+
+def users_log_func(session_id, word):
+    for id in users_log:
+        if str(id) == str(session_id):
+            users_log[id].append(word)
+    
 
 def scrayping(word):
     driver = webdriver.Chrome("driver/chromedriver")
@@ -65,7 +84,5 @@ def scrayping(word):
 
     return result
 
-
-## おまじない
 if __name__ == "__main__":
-    app.run(debug=True, threaded=True)
+    app.run(debug=True)

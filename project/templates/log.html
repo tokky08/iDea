@@ -7,11 +7,11 @@
         <thead class="thead-light">
             <tr>
                 <th scope="col" class="text-center">key</th>
-                <th scope="col" class="text-center">{{logs[0]}}</th>
+                <th scope="col" class="text-center">{{words_log[0]}}</th>
             </tr>
         </thead>
         <tbody>
-            {% for log in logs[1:] %}
+            {% for log in words_log[1:] %}
             <tr>
                 <th scope="row" class="text-center">{{loop.index}}</th>
                 <td class="text-center">{{log}}</td>
