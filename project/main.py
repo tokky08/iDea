@@ -3,13 +3,12 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import time
 import random
-from flask import Flask, session, redirect, url_for,  request
-
+import secret
 
 app = Flask(__name__)
 
-app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
-logs_user = {}
+app.secret_key = secret.secret_key
+users_log = {}
 
 @app.route("/", methods=["GET", "POST"])
 def top():
@@ -22,16 +21,8 @@ def top():
         log.append(word)
         session['id'] = random.random()
         session_id = session["id"]
-        logs_user[session_id] = log
-
-        # words_log = []
-        # for id in logs_user:
-        #     if str(id) == str(session_id):
-        #         words_log = logs_user[id]
-
-        # logs_user_func(session_id, word)
+        users_log[session_id] = log
         words_log = words_log_func(session_id)
-
 
         return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
         
@@ -39,28 +30,14 @@ def top():
 def again():
     session_id = request.form["session_id"]
     word = scrayping(request.form["word"])
-
-    # words_log = []
-    # for id in logs_user:
-    #     if str(id) == str(session_id):
-    #         logs_user[id].append(word)
-    #         words_log = logs_user[id]
-
-    logs_user_func(session_id, word)
+    users_log_func(session_id, word)
     words_log = words_log_func(session_id)
 
-    # logs.append(word)
     return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
 
 @app.route("/log", methods=["GET", "POST"])
 def log():
     session_id = request.form["session_id"]
-
-    # words_log = []
-    # for id in logs_user:
-    #     if str(id) == str(session_id):
-    #         words_log = logs_user[id]
-    
     words_log = words_log_func(session_id)
 
     return render_template('log.html', words_log=words_log)
@@ -68,16 +45,16 @@ def log():
 
 def words_log_func(session_id):
     words_log = []
-    for id in logs_user:
+    for id in users_log:
         if str(id) == str(session_id):
-            words_log = logs_user[id]
+            words_log = users_log[id]
     return words_log
 
 
-def logs_user_func(session_id, word):
-    for id in logs_user:
+def users_log_func(session_id, word):
+    for id in users_log:
         if str(id) == str(session_id):
-            logs_user[id].append(word)
+            users_log[id].append(word)
     
 
 def scrayping(word):
@@ -107,7 +84,5 @@ def scrayping(word):
 
     return result
 
-
-## おまじない
 if __name__ == "__main__":
-    app.run(debug=True, threaded=True)
+    app.run(debug=True)
