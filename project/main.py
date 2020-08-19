@@ -20,14 +20,13 @@ def top():
         # word = scrayping(request.form["word"])
         session['id'] = random.random()
         session_id = session["id"]
-        words_log = words_log_func(session_id)
         log = []
         log.append(request.form["word"])
         users_log[session_id] = log
+        words_log = words_log_func(session_id)
         word = wikipedia(request.form["word"], words_log)
         log.append(word)
         users_log[session_id] = log
-        words_log = words_log_func(session_id)
 
         return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
         
@@ -118,7 +117,9 @@ def wikipedia(word, words_log):
                 result = google(word, words_log)
                 
     except IndexError:
+        print("IndexError")
         result = google(word, words_log)
+        
 
     return result
 
@@ -157,15 +158,60 @@ def google(word, words_log):
     return result
 
 def duplication(result, words_log, li, i):
-    # ログがあれば
-    if len(words_log) > 0:
-        for word_log in words_log:
-            if result == word_log:
-                result = li[i].string
-                duplication(result, words_log, li, i+1)
-        return result
-    else:
-        return result
+    for word_log in words_log:
+        if result == word_log:
+            result = li[i].string
+            print("befor:{}".format(result))
+
+
+            for j in range(i, len(li)-1):
+                result = not_ng_words(result, li, j)
+
+
+            # ng_word_list = ng_words()
+            # # print(ng_word_list)
+            # for ng_word in ng_word_list:
+            #     # print(ng_word)
+            #     if ng_word in result:
+            #         # print("test")
+            #         i = i + 1
+            #         result = li[i].string
+            #         print("after:i:{},{}".format(i,result))
+                    
+
+
+
+            duplication(result, words_log, li, i + 1)
+        
+        else:
+            for j in range(i, len(li)-1):
+                result = not_ng_words(result, li, j)
+            
+    return result
+    
+
+
+def ng_words():
+    path = "NG_word.txt"
+    with open(path) as f:
+        l_strip = [s.strip() for s in f.readlines()]
+    
+    return l_strip
+
+def not_ng_words(result, li, i):
+    ng_word_list = ng_words()
+    for ng_word in ng_word_list:
+        if ng_word in result:
+            i = i + 1
+            result = li[i].string
+            not_ng_words(result, li, i+1)
+            print("after:i:{},{}".format(i,result))
+            return result
+    return result
+                
+
+
+    
 
 
 if __name__ == "__main__":
