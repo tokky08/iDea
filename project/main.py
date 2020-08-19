@@ -21,12 +21,11 @@ def top():
         session['id'] = random.random()
         session_id = session["id"]
         words_log = words_log_func(session_id)
-        word = wikipedia(request.form["word"], words_log)
         log = []
         log.append(request.form["word"])
+        users_log[session_id] = log
+        word = wikipedia(request.form["word"], words_log)
         log.append(word)
-        # session['id'] = random.random()
-        # session_id = session["id"]
         users_log[session_id] = log
         words_log = words_log_func(session_id)
 
@@ -39,7 +38,6 @@ def again():
     # word = scrayping(request.form["word"])
     word = wikipedia(request.form["word"], words_log)
     users_log_func(session_id, word)
-    # words_log = words_log_func(session_id)
 
     return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
 
@@ -108,30 +106,19 @@ def wikipedia(word, words_log):
     try:
         ul = relation[0].ul
         li = ul.find_all("li")
-        result = li[0].string
-
-        # print("ul:{}".format(ul))
-        # print("li:{}".format(li))
-
-        print("1:{}".format(result))
+        index = int(random.random()%len(li) - 1)
+        result = li[index].string
         
-        # print("li:{}".format(len(li)))
-
         # 過去の連想ワードとの重複チェック
-        for i in range(1, len(li) - 1):
+        for i in range(len(li) - 1):
             result = duplication(result, words_log, li, i)
-            # print("{}:{}".format(i,result))
-            if i == len(li) - 1:
-                result = google(word, words_log)
 
-        print("2:{}".format(result))
-        
+        for word_log in words_log:
+            if result == word_log:
+                result = google(word, words_log)
                 
     except IndexError:
-        # result = "ヒットしませんでした"
-        # print("3:{}".format(result))
         result = google(word, words_log)
-        print("3:{}".format(result))
 
     return result
 
@@ -145,29 +132,27 @@ def google(word, words_log):
     # elems = soup.find(class_="ext-related-articles-card-list")
     elems = soup.find_all("span")
     elems = soup.find_all(class_="BNeawe deIvCb AP7Wnd")
-
-    print(words_log)
-    print("google")
         
     try:
         index = int(random.random()%len(elems) - 1)
         result = elems[index].string
-        if len(result.split(" "))>1:
-            if result.split(" ")[0] == word:
-                result = result.split(" ")[1]
-            else:
-                result = result.split(" ")[0]
-        if result == "関連キーワード" or result== word:
-            result = elems[index-1].string
-            if len(result.split(" "))>1:
-                if result.split(" ")[0] == word:
-                    result = result.split(" ")[1]
-                else:
-                    result = result.split(" ")[0]
+
+        # 過去の連想ワードとの重複チェック
+        for i in range(len(elems) - 1):
+            result = duplication(result, words_log, elems, i)
+            
+        for word_log in words_log:
+            if result == word_log:
+                result = "Give Up"
+
     except IndexError:
         result = elems[-1].string
-        if result == "関連キーワード":
-            result = elems[-2].string
+        for word_log in words_log:
+            if result == word_log:
+                result = "Give Up IndexError"
+    
+    except ZeroDivisionError:
+        result = "Give Up ZeroDivisionError"
 
     return result
 
@@ -175,16 +160,13 @@ def duplication(result, words_log, li, i):
     # ログがあれば
     if len(words_log) > 0:
         for word_log in words_log:
-            print("test")
             if result == word_log:
                 result = li[i].string
-                print("d:{}:{}".format(i,result))
                 duplication(result, words_log, li, i+1)
-            else:
-                print("d_else:{}".format(result))
-                return result
+        return result
     else:
         return result
+
 
 if __name__ == "__main__":
     app.run(debug=True)
