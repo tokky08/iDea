@@ -103,30 +103,35 @@ def wikipedia(word, words_log):
     elems = soup.find(class_="ext-related-articles-card-list")
     relation = soup.find_all("div",id="mw-normal-catlinks")
 
+    print("wiki")
+
     try:
         ul = relation[0].ul
         li = ul.find_all("li")
         result = li[0].string
 
-        # for word_log in words_log:
-        #     if result == word_log:
-        #         result = li[-1].string
-        #     else:
+        # print("ul:{}".format(ul))
+        # print("li:{}".format(li))
 
-        #         for item in words_log:
-        #             if result == item:
-        #                 result = li[-2].string
+        print("1:{}".format(result))
+        
+        # print("li:{}".format(len(li)))
 
-
-
-        if result == word:
-            result = li[-1].string
-            if result == word:
+        # 過去の連想ワードとの重複チェック
+        for i in range(1, len(li) - 1):
+            result = duplication(result, words_log, li, i)
+            # print("{}:{}".format(i,result))
+            if i == len(li) - 1:
                 result = google(word, words_log)
+
+        print("2:{}".format(result))
+        
                 
     except IndexError:
         # result = "ヒットしませんでした"
+        # print("3:{}".format(result))
         result = google(word, words_log)
+        print("3:{}".format(result))
 
     return result
 
@@ -142,6 +147,7 @@ def google(word, words_log):
     elems = soup.find_all(class_="BNeawe deIvCb AP7Wnd")
 
     print(words_log)
+    print("google")
         
     try:
         index = int(random.random()%len(elems) - 1)
@@ -165,6 +171,20 @@ def google(word, words_log):
 
     return result
 
+def duplication(result, words_log, li, i):
+    # ログがあれば
+    if len(words_log) > 0:
+        for word_log in words_log:
+            print("test")
+            if result == word_log:
+                result = li[i].string
+                print("d:{}:{}".format(i,result))
+                duplication(result, words_log, li, i+1)
+            else:
+                print("d_else:{}".format(result))
+                return result
+    else:
+        return result
 
 if __name__ == "__main__":
     app.run(debug=True)
