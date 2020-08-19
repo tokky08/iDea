@@ -4,6 +4,8 @@ from selenium.webdriver.common.keys import Keys
 import time
 import random
 import secret
+import requests
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
@@ -15,7 +17,8 @@ def top():
     if request.method == "GET":
         return render_template('top.html')
     else:
-        word = scrayping(request.form["word"])
+        # word = scrayping(request.form["word"])
+        word = wikipedia(request.form["word"])
         log = []
         log.append(request.form["word"])
         log.append(word)
@@ -29,7 +32,8 @@ def top():
 @app.route("/again", methods=["GET", "POST"])
 def again():
     session_id = request.form["session_id"]
-    word = scrayping(request.form["word"])
+    # word = scrayping(request.form["word"])
+    word = wikipedia(request.form["word"])
     users_log_func(session_id, word)
     words_log = words_log_func(session_id)
 
@@ -83,6 +87,31 @@ def scrayping(word):
     driver.quit()
 
     return result
+
+def wikipedia(word):
+
+    # スクレイピング対象の URL にリクエストを送り HTML を取得する
+    res = requests.get('https://ja.wikipedia.org/wiki/' + word)
+
+    # レスポンスの HTML から BeautifulSoup オブジェクトを作る
+    soup = BeautifulSoup(res.text, 'html.parser')
+
+    elems = soup.find(class_="ext-related-articles-card-list")
+    relation = soup.find_all("div",id="mw-normal-catlinks")
+
+    try:
+        ul = relation[0].ul
+        li = ul.find_all("li")
+        result = li[0].string
+        if result == word:
+            result = li[-1].string
+            # if result = word:
+                
+    except IndexError:
+        result = "ヒットしませんでした"
+
+    return result
+
 
 if __name__ == "__main__":
     app.run(debug=True)
