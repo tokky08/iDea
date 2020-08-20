@@ -125,6 +125,8 @@ def wikipedia(word, words_log):
                 
     except IndexError:
         result = google(word, words_log)
+
+    print(space_check(result))
         
 
     return result
@@ -158,6 +160,8 @@ def google(word, words_log):
         ng = ng_words_check(result)
         if dupl or ng:
             result = "降参です"
+
+        print(space_check(result))
             
         return result
 
@@ -193,6 +197,13 @@ def ng_words_check(result):
         if re.search(ng_word, str(result)):
             return True
     return False
+
+def space_check(result):
+    result_list = result.split(" ")
+    if len(result_list) > 1:
+        return True
+    return False
+
                 
 
 
