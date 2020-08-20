@@ -107,26 +107,29 @@ def wikipedia(word, words_log):
         index = int(random.random()%len(li) - 1)
         result = li[index].string
 
-        # 重複チェックとNGワードチェック
+        # 重複チェックとNGワードチェックとスペースチェック
         for item in li:
             dupl = duplication_check(result, words_log)
             ng = ng_words_check(result)
-            if dupl or ng:
+            space = space_check(result)
+            if dupl or ng or space:
                 result = item.string
             else:
                 break
 
-        # 最後の重複チェックとNGワードチェック
+
+        # 最後の重複チェックとNGワードチェックとスペースチェック
         dupl = duplication_check(result, words_log)
         ng = ng_words_check(result)
-        if dupl or ng:
+        space = space_check(result)
+        if dupl or ng or space:
             result = google(word, words_log)
+        
         
                 
     except IndexError:
         result = google(word, words_log)
-
-    print(space_check(result))
+    
         
 
     return result
@@ -146,23 +149,23 @@ def google(word, words_log):
         index = int(random.random()%len(elems) - 1)
         result = elems[index].string
 
-        # 重複チェックとNGワードチェック
+        # 重複チェックとNGワードチェックとスペースチェック
         for item in elems:
             dupl = duplication_check(result, words_log)
             ng = ng_words_check(result)
-            if dupl or ng:
+            space = space_check(result)
+            if dupl or ng or space:
                 result = item.string
             else:
                 break
 
-        # 最後の重複チェックとNGワードチェック
+        # 最後の重複チェックとNGワードチェックとスペースチェック
         dupl = duplication_check(result, words_log)
         ng = ng_words_check(result)
-        if dupl or ng:
+        space = space_check(result)
+        if dupl or ng or space:
             result = "降参です"
 
-        print(space_check(result))
-            
         return result
 
     except IndexError:
@@ -199,15 +202,23 @@ def ng_words_check(result):
     return False
 
 def space_check(result):
-    result_list = result.split(" ")
+    result_list = str(result).split(" ")
     if len(result_list) > 1:
         return True
     return False
 
-                
-
-
-    
+# def space_select(result):
+#     result_list = result.split(" ")
+#     index = int(random.random() % len(result_list))
+#     result_select = result_list[index]
+#     if result_select == result:
+#         if index == 0:
+#             result_select = result_list[index + 1]
+#         else:
+#             result_select = result_list[index - 1]
+#         return result_select
+#     else:
+#         return result_select
 
 
 if __name__ == "__main__":
