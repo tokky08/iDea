@@ -101,26 +101,30 @@ def wikipedia(word, words_log):
     elems = soup.find(class_="ext-related-articles-card-list")
     relation = soup.find_all("div",id="mw-normal-catlinks")
 
-    print("wiki")
-
     try:
         ul = relation[0].ul
         li = ul.find_all("li")
         index = int(random.random()%len(li) - 1)
         result = li[index].string
-        
-        # 過去の連想ワードとの重複チェック
-        for i in range(len(li) - 1):
-            result = duplication(result, words_log, li, i)
 
-        for word_log in words_log:
-            if result == word_log:
-                result = google(word, words_log)
+        # 重複チェックとNGワードチェック
+        for item in li:
+            dupl = duplication_check(result, words_log)
+            ng = ng_words_check(result)
+            if dupl or ng:
+                result = item.string
+            else:
+                break
+
+        # 最後の重複チェックとNGワードチェック
+        dupl = duplication_check(result, words_log)
+        ng = ng_words_check(result)
+        if dupl or ng:
+            result = google(word, words_log)
+        
                 
     except IndexError:
-        print("IndexError")
         result = google(word, words_log)
-        print("IndexError:{}".format(result))
         
 
     return result
@@ -139,15 +143,21 @@ def google(word, words_log):
     try:
         index = int(random.random()%len(elems) - 1)
         result = elems[index].string
-        print("google,try:{}".format(result))
 
-        # 過去の連想ワードとの重複チェック
-        for i in range(len(elems) - 1):
-            result = duplication(result, words_log, elems, i)
-            
-        for word_log in words_log:
-            if result == word_log:
-                result = "Give Up"
+        # 重複チェックとNGワードチェック
+        for item in elems:
+            dupl = duplication_check(result, words_log)
+            ng = ng_words_check(result)
+            if dupl or ng:
+                result = item.string
+            else:
+                break
+
+        # 最後の重複チェックとNGワードチェック
+        dupl = duplication_check(result, words_log)
+        ng = ng_words_check(result)
+        if dupl or ng:
+            result = "降参です"
             
         return result
 
@@ -165,41 +175,11 @@ def google(word, words_log):
         return result
 
 
-def duplication(result, words_log, li, i):
-    print("result:{}".format(result))
+def duplication_check(result, words_log):
     for word_log in words_log:
         if result == word_log:
-            result = li[i+1].string
-            print("befor:{}".format(result))
-
-
-            for j in range(i, len(li)-1):
-                result = not_ng_words(result, li, j)
-
-
-            # ng_word_list = ng_words()
-            # # print(ng_word_list)
-            # for ng_word in ng_word_list:
-            #     # print(ng_word)
-            #     if ng_word in result:
-            #         # print("test")
-            #         i = i + 1
-            #         result = li[i].string
-            #         print("after:i:{},{}".format(i,result))
-                    
-
-
-
-            duplication(result, words_log, li, i + 1)
-        
-        else:
-            print("li:{}".format(len(li)))
-            for j in range(i, len(li)-1):
-                result = not_ng_words(result, li, j)
-            
-    return result
-    
-
+            return True    
+    return False
 
 def ng_words():
     path = "NG_word.txt"
@@ -207,21 +187,12 @@ def ng_words():
         l_strip = [s.strip() for s in f.readlines()]
     return l_strip
 
-def not_ng_words(result, li, i):
+def ng_words_check(result):
     ng_word_list = ng_words()
-    # print("NG:{}".format(result))
     for ng_word in ng_word_list:
-        print("ng_word:{}{}, result:{}{}".format(ng_word, type(ng_word), type(str(result)), result))
         if re.search(ng_word, str(result)):
-            print("NG")
-            i = i + 1
-            result = li[i].string
-            result =  "テスト！！！" + str(i)
-            print("NG_result:{}".format(result))
-            not_ng_words(result, li, i+1)
-            print("after:i:{},{}".format(i,result))
-            return result
-    return result
+            return True
+    return False
                 
 
 
