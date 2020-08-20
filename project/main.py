@@ -1,11 +1,12 @@
 from flask import *
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+# from selenium import webdriver
+# from selenium.webdriver.common.keys import Keys
 import time
 import random
 import secret
 import requests
 from bs4 import BeautifulSoup
+import re     
 
 app = Flask(__name__)
 
@@ -119,6 +120,7 @@ def wikipedia(word, words_log):
     except IndexError:
         print("IndexError")
         result = google(word, words_log)
+        print("IndexError:{}".format(result))
         
 
     return result
@@ -137,6 +139,7 @@ def google(word, words_log):
     try:
         index = int(random.random()%len(elems) - 1)
         result = elems[index].string
+        print("google,try:{}".format(result))
 
         # 過去の連想ワードとの重複チェック
         for i in range(len(elems) - 1):
@@ -145,22 +148,28 @@ def google(word, words_log):
         for word_log in words_log:
             if result == word_log:
                 result = "Give Up"
+            
+        return result
 
     except IndexError:
         result = elems[-1].string
         for word_log in words_log:
             if result == word_log:
                 result = "Give Up IndexError"
+
+        return result
     
     except ZeroDivisionError:
         result = "Give Up ZeroDivisionError"
 
-    return result
+        return result
+
 
 def duplication(result, words_log, li, i):
+    print("result:{}".format(result))
     for word_log in words_log:
         if result == word_log:
-            result = li[i].string
+            result = li[i+1].string
             print("befor:{}".format(result))
 
 
@@ -184,6 +193,7 @@ def duplication(result, words_log, li, i):
             duplication(result, words_log, li, i + 1)
         
         else:
+            print("li:{}".format(len(li)))
             for j in range(i, len(li)-1):
                 result = not_ng_words(result, li, j)
             
@@ -195,15 +205,19 @@ def ng_words():
     path = "NG_word.txt"
     with open(path) as f:
         l_strip = [s.strip() for s in f.readlines()]
-    
     return l_strip
 
 def not_ng_words(result, li, i):
     ng_word_list = ng_words()
+    # print("NG:{}".format(result))
     for ng_word in ng_word_list:
-        if ng_word in result:
+        print("ng_word:{}{}, result:{}{}".format(ng_word, type(ng_word), type(str(result)), result))
+        if re.search(ng_word, str(result)):
+            print("NG")
             i = i + 1
             result = li[i].string
+            result =  "テスト！！！" + str(i)
+            print("NG_result:{}".format(result))
             not_ng_words(result, li, i+1)
             print("after:i:{},{}".format(i,result))
             return result
