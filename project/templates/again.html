@@ -22,4 +22,28 @@
     </div>
 </div>
 
+
+<div class="log mx-auto">
+    <h1 class="text-center text-muted mt-4">履歴（Log）</h1>
+    <table class="table mt-4">
+        <thead class="thead-light">
+            <tr>
+                <th scope="col" class="text-center">key</th>
+                <th scope="col" class="text-center">{{words_log[0]}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in words_log[1:] %}
+            <tr>
+                <th scope="row" class="text-center">{{loop.index}}</th>
+                <td class="text-center">{{log}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form action="/" method="GET" class="text-center mt-3">
+        <p><button class="btn btn-primary btn-lg mt-5" type="submit" name="word" value={{word}}>はじめからもう一回する</button><p>
+    </form>
+</div>
+
 {% endblock %}
