@@ -164,7 +164,7 @@ def google(word, words_log):
         ng = ng_words_check(result)
         space = space_check(result)
         if dupl or ng or space:
-            result = "降参です"
+            result = "ヒットしませんでした。現在開発中です。"
 
         return result
 
@@ -172,12 +172,12 @@ def google(word, words_log):
         result = elems[-1].string
         for word_log in words_log:
             if result == word_log:
-                result = "Give Up IndexError"
+                result = "IndexError"
 
         return result
     
     except ZeroDivisionError:
-        result = "Give Up ZeroDivisionError"
+        result = "ZeroDivisionError"
 
         return result
 
@@ -204,8 +204,16 @@ def ng_words_check(result):
 def space_check(result):
     result_list = str(result).split(" ")
     if len(result_list) > 1:
-        return True
+        english = english_check(result_list)
+        return english
     return False
+
+def english_check(result_list):
+    check = re.compile('[a-zA-Zａ-ｚＡ-Ｚ]+')
+    for item in result_list:
+        if not check.fullmatch(item):
+            return False
+    return True
 
 # def space_select(result):
 #     result_list = result.split(" ")
