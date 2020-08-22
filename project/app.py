@@ -6,7 +6,11 @@ import random
 import secret
 import requests
 from bs4 import BeautifulSoup
-import re     
+import re
+import MeCab
+import pandas as pd
+import unicodedata
+from gensim.models import word2vec
 
 app = Flask(__name__)
 
@@ -164,7 +168,8 @@ def google(word, words_log):
         ng = ng_words_check(result)
         space = space_check(result)
         if dupl or ng or space:
-            result = "ヒットしませんでした。現在開発中です。"
+            # result = "ヒットしませんでした。現在開発中です。"
+            result = word2vec_func(word)
 
         return result
 
@@ -172,12 +177,14 @@ def google(word, words_log):
         result = elems[-1].string
         for word_log in words_log:
             if result == word_log:
-                result = "IndexError"
+                # result = "IndexError"
+                result = word2vec_func(word)
 
         return result
     
     except ZeroDivisionError:
         result = "ZeroDivisionError"
+        result = word2vec_func(word)
 
         return result
 
@@ -215,18 +222,99 @@ def english_check(result_list):
             return False
     return True
 
-# def space_select(result):
-#     result_list = result.split(" ")
-#     index = int(random.random() % len(result_list))
-#     result_select = result_list[index]
-#     if result_select == result:
-#         if index == 0:
-#             result_select = result_list[index + 1]
-#         else:
-#             result_select = result_list[index - 1]
-#         return result_select
-#     else:
-#         return result_select
+
+
+def word2vec_func(word):
+    preprocessing('https://www.google.com/search?q=', word)
+    preprocessing('https://ja.wikipedia.org/wiki/', word)
+    mecab(word)
+    result_list = word2vec_(word)
+
+    return result_list[0][0]
+
+
+def preprocessing(url, word):
+    res = requests.get(url + word)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    for script in soup(["script", "style"]):
+        script.decompose()
+    text = soup.get_text()
+    lines = [line.strip() for line in text.splitlines()]
+
+    with open('public_text.tsv','a', encoding='utf-8') as f:
+        for r in lines:
+            try:
+                f.write(normalize_text(r) + '\n')
+            except:
+                continue
+
+def mecab(word):
+    #データ　インポート
+    df = pd.read_csv(open('public_text.tsv','rU'), sep='\t', names=['text'], encoding='utf-8',engine='c')
+    text_lists = df['text'].unique().tolist()
+
+    #分かち書き
+    # mt = MeCab.Tagger("-Ochasen -d '/path/mecab-ipadic~") #自分がインストールした辞書を指定
+    mt = MeCab.Tagger() #自分がインストールした辞書を指定
+
+    with open('public_text.txt', 'w', encoding='utf-8') as f:
+        for text in text_lists:
+            tmp_lists = []
+            text = unicodedata.normalize('NFKC',str(text))
+    #         if 'まじ卍' in text:
+    #             text = text.replace('まじ卍','マジ卍')
+            if word in text:
+                text_splited = text.split(word)
+                for i, text in enumerate(text_splited):
+                    node = mt.parseToNode(text)
+                    while node:
+                        if node.feature.startswith('名詞') or node.feature.startswith('形容詞'):
+                            tmp_lists.append(node.surface)
+                        node = node.next
+                    if i != len(text_splited)-1:
+                        tmp_lists.append(word)
+            else:
+                node = mt.parseToNode(text)
+            while node:
+                if node.feature.startswith('名詞') or node.feature.startswith('形容詞'):
+                    tmp_lists.append(node.surface)
+                node = node.next
+            f.write(' '.join(tmp_lists) + '\n')
+
+def word2vec_(word):
+    print("test1")
+    # sentences = word2vec.LineSentence('public_text_splited_google.txt')
+    sentences = word2vec.LineSentence("public_text.txt")
+    print("test2")
+    model = word2vec.Word2Vec(
+        sentences,
+        sg=1,         #0: CBOW, 1: skip-gram
+        size=300,     # ベクトルの次元数
+        window=5,    # 入力単語からの最大距離
+        min_count=5,  # 単語の出現回数でフィルタリング
+    )
+
+    result_list = model.most_similar(positive=word, topn=30)
+
+    return result_list
+
+def normalize_text(text):
+    text = re.sub(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-…]+', "", text)
+    text = re.sub('RT', "", text)
+    text = re.sub('お気に入り', "", text)
+    text = re.sub('まとめ', "", text)
+    text = re.sub(r'[!-~]', "", text)
+    text = re.sub(r'[︰-＠]', "", text)
+    text = re.sub('\u3000',"", text)
+    text = re.sub('\t', "", text)
+    text = re.sub('·', "", text)
+    text = re.sub('›', "", text)
+    text = re.sub('日', "", text)
+    text = re.sub('時間', "", text)
+    text = text.strip()
+    return text
+
+
 
 
 if __name__ == "__main__":
