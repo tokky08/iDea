@@ -44,7 +44,18 @@ def again():
     word = wikipedia(request.form["word"], words_log)
     users_log_func(session_id, word)
 
+    print(users_log)
+
     return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
+
+@app.route("/detail", methods=["GET", "POST"])
+def detail():
+    session_id = request.form["session_id"]
+    words_log = words_log_func(session_id)
+    word = request.form["word"]
+    detail = wiki_detail(word)
+
+    return render_template('detail.html', word=word, detail=detail, session_id=session_id, words_log=words_log)
 
 @app.route("/log", methods=["GET", "POST"])
 def log():
@@ -135,9 +146,8 @@ def wikipedia(word, words_log):
     except IndexError:
         result = google(word, words_log)
     
-        
-
     return result
+
 
 def google(word, words_log):
     # スクレイピング対象の URL にリクエストを送り HTML を取得する
@@ -184,7 +194,7 @@ def google(word, words_log):
         return result
     
     except ZeroDivisionError:
-        result = "ZeroDivisionError"
+        # result = "ZeroDivisionError"
         result = all_google_wiki(word)
 
         return result
@@ -300,6 +310,7 @@ def word2vec_func(word):
         result_list = model.most_similar(positive=word, topn=30)
         result = result_list[0][0]
         return result
+
     except KeyError:
         mpr = mecabpr.MeCabPosRegex()
         result_list = mpr.findall(word, "名詞-一般")
@@ -343,6 +354,13 @@ def replace(word, key):
     word = re.sub(key, "", word)
     return word
 
+
+def wiki_detail(word):
+    res = requests.get("https://ja.m.wikipedia.org/wiki/" + word)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    elems = soup.find(id="mf-section-0")
+    text = elems.p.text
+    return text
 
 
 

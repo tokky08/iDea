@@ -3,18 +3,14 @@
 
 <div class="again">
     <div class="card bg-light mb-3 mx-auto mt-5">
-        <div class="card-header">{{words_log[-2]}}と言えば</div>
+        <div class="card-header">{{words_log[-1]}}とは</div>
         <div class="card-body">
-            <h1 class="card-title text-center mt-5 mb-5">{{word}}</h1>
+            <p class="card-title text-left mt-5 mb-5">{{detail}}</p>
         </div>
     </div>
-    <div class="d-flex justify-content-between mx-auto my-5">
+    <div class="d-flex justify-content-around mx-auto my-5">
         <form action="/log" method="POST" class="mb-5">
             <button class="btn btn-primary" type="submit" name="session_id" value={{session_id}}>終了する</button>
-        </form>
-        <form action="detail" method="POST">
-            <button class="btn btn-primary" type="submit" name="word" value={{word}}>くわしく</button>
-            <input type="hidden" name="session_id" value={{session_id}}>
         </form>
         <form action="/again" method="POST">
             <button class="btn btn-primary" type="submit" name="word" value={{word}}>もう一回</button>
