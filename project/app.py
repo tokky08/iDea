@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import MeCab
+import mecabpr
 import pandas as pd
 import unicodedata
 from gensim.models import word2vec
@@ -169,7 +170,7 @@ def google(word, words_log):
         space = space_check(result)
         if dupl or ng or space:
             # result = "ヒットしませんでした。現在開発中です。"
-            result = word2vec_func(word)
+            result = all_google_wiki(word)
 
         return result
 
@@ -178,13 +179,13 @@ def google(word, words_log):
         for word_log in words_log:
             if result == word_log:
                 # result = "IndexError"
-                result = word2vec_func(word)
+                result = all_google_wiki(word)
 
         return result
     
     except ZeroDivisionError:
         result = "ZeroDivisionError"
-        result = word2vec_func(word)
+        result = all_google_wiki(word)
 
         return result
 
@@ -224,13 +225,14 @@ def english_check(result_list):
 
 
 
-def word2vec_func(word):
+def all_google_wiki(word):
     preprocessing('https://www.google.com/search?q=', word)
     preprocessing('https://ja.wikipedia.org/wiki/', word)
     mecab(word)
-    result_list = word2vec_(word)
+    # result_list = word2vec_(word)
+    result = word2vec_func(word)
 
-    return result_list[0][0]
+    return result
 
 
 def preprocessing(url, word):
@@ -281,11 +283,9 @@ def mecab(word):
                 node = node.next
             f.write(' '.join(tmp_lists) + '\n')
 
-def word2vec_(word):
-    print("test1")
+def word2vec_func(word):
     # sentences = word2vec.LineSentence('public_text_splited_google.txt')
     sentences = word2vec.LineSentence("public_text.txt")
-    print("test2")
     model = word2vec.Word2Vec(
         sentences,
         sg=1,         #0: CBOW, 1: skip-gram
@@ -294,9 +294,20 @@ def word2vec_(word):
         min_count=5,  # 単語の出現回数でフィルタリング
     )
 
-    result_list = model.most_similar(positive=word, topn=30)
+    word = replace(word, "（株）")
 
-    return result_list
+    try:
+        result_list = model.most_similar(positive=word, topn=30)
+        result = result_list[0][0]
+        return result
+    except KeyError:
+        mpr = mecabpr.MeCabPosRegex()
+        result_list = mpr.findall(word, "名詞-一般")
+        result = result_list[-1][0]
+        return result
+
+
+    # return result_list
 
 def normalize_text(text):
     text = re.sub(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-…]+', "", text)
@@ -309,10 +320,28 @@ def normalize_text(text):
     text = re.sub('\t', "", text)
     text = re.sub('·', "", text)
     text = re.sub('›', "", text)
+    text = re.sub('~', "", text)
+    text = re.sub('-', "", text)
+    text = re.sub('こと', "", text)
     text = re.sub('日', "", text)
     text = re.sub('時間', "", text)
+    text = re.sub('全角', "", text)
+    text = re.sub('英数字', "", text)
+    text = re.sub('半角', "", text)
+    text = re.sub('カナ', "", text)
+    text = re.sub('ローマ', "", text)
+    text = re.sub('ここ', "", text)
+    text = re.sub('場合', "", text)
+    text = re.sub('クリック', "", text)
+    text = re.sub('すべて', "", text)
+    text = re.sub('ニュース', "", text)
     text = text.strip()
+
     return text
+
+def replace(word, key):
+    word = re.sub(key, "", word)
+    return word
 
 
 
