@@ -12,6 +12,7 @@ import mecabpr
 import pandas as pd
 import unicodedata
 from gensim.models import word2vec
+# from functions import *
 
 app = Flask(__name__)
 
@@ -356,10 +357,14 @@ def replace(word, key):
 
 
 def wiki_detail(word):
-    res = requests.get("https://ja.m.wikipedia.org/wiki/" + word)
-    soup = BeautifulSoup(res.text, 'html.parser')
-    elems = soup.find(id="mf-section-0")
-    text = elems.p.text
+    try:
+        res = requests.get("https://ja.m.wikipedia.org/wiki/" + word)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        elems = soup.find(id="mf-section-0")
+        text = elems.p.text
+    except AttributeError:
+        pass
+
     return text
 
 
