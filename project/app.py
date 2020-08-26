@@ -24,7 +24,6 @@ def top():
     if request.method == "GET":
         return render_template('top.html')
     else:
-        # word = scrayping(request.form["word"])
         session['id'] = random.random()
         session_id = session["id"]
         log = []
@@ -41,11 +40,8 @@ def top():
 def again():
     session_id = request.form["session_id"]
     words_log = words_log_func(session_id)
-    # word = scrayping(request.form["word"])
     word = wikipedia(request.form["word"], words_log)
     users_log_func(session_id, word)
-
-    print(users_log)
 
     return render_template('again.html', word=word, session_id=session_id, words_log=words_log)
 
@@ -54,9 +50,10 @@ def detail():
     session_id = request.form["session_id"]
     words_log = words_log_func(session_id)
     word = request.form["word"]
-    detail = wiki_detail(word)
+    detail_text = wiki_detail(word)["text"]
+    detail_url = wiki_detail(word)["url"]
 
-    return render_template('detail.html', word=word, detail=detail, session_id=session_id, words_log=words_log)
+    return render_template('detail.html', word=word, detail_text=detail_text, detail_url=detail_url, session_id=session_id, words_log=words_log)
 
 @app.route("/log", methods=["GET", "POST"])
 def log():
@@ -108,13 +105,8 @@ def scrayping(word):
     return result
 
 def wikipedia(word, words_log):
-
-    # スクレイピング対象の URL にリクエストを送り HTML を取得する
     res = requests.get('https://ja.wikipedia.org/wiki/' + word)
-
-    # レスポンスの HTML から BeautifulSoup オブジェクトを作る
     soup = BeautifulSoup(res.text, 'html.parser')
-
     elems = soup.find(class_="ext-related-articles-card-list")
     relation = soup.find_all("div",id="mw-normal-catlinks")
 
@@ -134,7 +126,6 @@ def wikipedia(word, words_log):
             else:
                 break
 
-
         # 最後の重複チェックとNGワードチェックとスペースチェック
         dupl = duplication_check(result, words_log)
         ng = ng_words_check(result)
@@ -142,8 +133,6 @@ def wikipedia(word, words_log):
         if dupl or ng or space:
             result = google(word, words_log)
         
-        
-                
     except IndexError:
         result = google(word, words_log)
     
@@ -151,13 +140,8 @@ def wikipedia(word, words_log):
 
 
 def google(word, words_log):
-    # スクレイピング対象の URL にリクエストを送り HTML を取得する
     res = requests.get('https://www.google.com/search?q=' + word)
-
-    # レスポンスの HTML から BeautifulSoup オブジェクトを作る
     soup = BeautifulSoup(res.text, 'html.parser')
-
-    # elems = soup.find(class_="ext-related-articles-card-list")
     elems = soup.find_all("span")
     elems = soup.find_all(class_="BNeawe deIvCb AP7Wnd")
         
@@ -180,8 +164,7 @@ def google(word, words_log):
         ng = ng_words_check(result)
         space = space_check(result)
         if dupl or ng or space:
-            # result = "ヒットしませんでした。現在開発中です。"
-            result = all_google_wiki(word)
+            result = all_google_wiki(word, words_log)
 
         return result
 
@@ -189,14 +172,12 @@ def google(word, words_log):
         result = elems[-1].string
         for word_log in words_log:
             if result == word_log:
-                # result = "IndexError"
-                result = all_google_wiki(word)
+                result = all_google_wiki(word, words_log)
 
         return result
     
     except ZeroDivisionError:
-        # result = "ZeroDivisionError"
-        result = all_google_wiki(word)
+        result = all_google_wiki(word, words_log)
 
         return result
 
@@ -236,12 +217,12 @@ def english_check(result_list):
 
 
 
-def all_google_wiki(word):
+def all_google_wiki(word, words_log):
     preprocessing('https://www.google.com/search?q=', word)
     preprocessing('https://ja.wikipedia.org/wiki/', word)
     mecab(word)
     # result_list = word2vec_(word)
-    result = word2vec_func(word)
+    result = word2vec_func(word, words_log)
 
     return result
 
@@ -294,7 +275,7 @@ def mecab(word):
                 node = node.next
             f.write(' '.join(tmp_lists) + '\n')
 
-def word2vec_func(word):
+def word2vec_func(word, words_log):
     # sentences = word2vec.LineSentence('public_text_splited_google.txt')
     sentences = word2vec.LineSentence("public_text.txt")
     model = word2vec.Word2Vec(
@@ -310,12 +291,35 @@ def word2vec_func(word):
     try:
         result_list = model.most_similar(positive=word, topn=30)
         result = result_list[0][0]
+
+        # 重複チェックとNGワードチェックとスペースチェック
+        for i in range(len(result_list)):
+            dupl = duplication_check(result, words_log)
+            ng = ng_words_check(result)
+            space = space_check(result)
+            if dupl or ng or space:
+                result = result_list[i][0]
+            else:
+                break
+
         return result
 
+    # ボキャブラリーにないのでwordを品詞分解
     except KeyError:
         mpr = mecabpr.MeCabPosRegex()
         result_list = mpr.findall(word, "名詞-一般")
         result = result_list[-1][0]
+
+        # 重複チェックとNGワードチェックとスペースチェック
+        for i in range(len(result_list)):
+            dupl = duplication_check(result, words_log)
+            ng = ng_words_check(result)
+            space = space_check(result)
+            if dupl or ng or space:
+                result = result_list[i][0]
+            else:
+                break
+
         return result
 
 
@@ -362,10 +366,47 @@ def wiki_detail(word):
         soup = BeautifulSoup(res.text, 'html.parser')
         elems = soup.find(id="mf-section-0")
         text = elems.p.text
+        result = {
+            "text": text,
+            "url": "https://ja.m.wikipedia.org/wiki/" + word
+        }
+        return result
     except AttributeError:
-        pass
+        result = {
+            "text": "",
+            "url": google_url(word)
+        }
+        return result
 
-    return text
+
+def google_url(word):      
+    response = requests.get('https://www.google.co.jp/search?q=' + word + "とは")
+    response.raise_for_status()
+    bs = BeautifulSoup(response.text, "html.parser")
+    element = bs.select("a")
+
+    title_list = []
+    url_list = []
+    for i in range(len(element)):
+        title = element[i].get_text()    
+        url = element[i].get('href').replace('/url?q=','')
+        title_list.append(title)
+        url_list.append(url)
+        
+    title_list_02 = []
+    url_list_02 = []
+    for i in range(17, len(title_list)):
+        title_list_02.append(title_list[i])
+        url_list_02.append(url_list[i])
+        
+    title_list_03 = []
+    url_list_03 = []
+    for i in range(len(title_list_02)):
+        if "https:" in url_list_02[i]:
+            title_list_03.append(title_list_02[i])
+            url_list_03.append(url_list_02[i])
+
+    return url_list_03[0]
 
 
 
