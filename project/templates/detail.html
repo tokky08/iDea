@@ -5,7 +5,13 @@
     <div class="card bg-light mb-3 mx-auto mt-5">
         <div class="card-header">{{words_log[-1]}}とは</div>
         <div class="card-body">
-            <p class="card-title text-left mt-5 mb-5">{{detail}}</p>
+            <!--<p class="card-title text-left mt-5 mb-5">{{detail}}<a href="https://ja.wikipedia.org/wiki/{{word}}">（詳しくはこちら）</a></p>-->
+            <!--<p class="card-title text-left mt-5 mb-5">{{detail_text}}<a href={{detail_url}}>（詳しくはこちら）</a></p>-->
+            {% if detail_text == "" %}
+            <p class="card-title text-center mt-5 mb-5">{{detail_text}}<a href={{detail_url}}>（詳しくはこちら）</a></p>
+            {% else %}
+            <p class="card-title text-left mt-5 mb-5">{{detail_text}}<a href={{detail_url}}>（詳しくはこちら）</a></p>
+            {% endif %}
         </div>
     </div>
     <div class="d-flex justify-content-around mx-auto my-5">
