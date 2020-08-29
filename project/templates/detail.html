@@ -4,7 +4,7 @@
 <div class="again">
     <div class="card bg-light mb-3 mx-auto mt-5">
         <div class="card-header">{{words_log[-1]}}とは</div>
-        <div class="card-body">
+        <div id="vue" class="card-body">
             <!--<p class="card-title text-left mt-5 mb-5">{{detail}}<a href="https://ja.wikipedia.org/wiki/{{word}}">（詳しくはこちら）</a></p>-->
             <!--<p class="card-title text-left mt-5 mb-5">{{detail_text}}<a href={{detail_url}}>（詳しくはこちら）</a></p>-->
             {% if detail_text == "" %}
@@ -25,4 +25,16 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script>
+// Vue インスタンスにオブジェクトを追加する
+var vm = new Vue({
+    el: '#vue',
+    data: {
+        detail_text: '{{ detail_text }}',
+    }
+})
+</script>
 {% endblock %}
