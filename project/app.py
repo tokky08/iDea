@@ -366,6 +366,7 @@ def wiki_detail(word):
         soup = BeautifulSoup(res.text, 'html.parser')
         elems = soup.find(id="mf-section-0")
         text = elems.p.text
+        text = text.replace('\n','')
         result = {
             "text": text,
             "url": "https://ja.m.wikipedia.org/wiki/" + word
